@@ -1,35 +1,39 @@
-# Procurement System — Project Context
+# CLAUDE.md — Session Context (Procurement System)
 
-## Collaboration Protocol
+> Đọc file này trước khi làm bất cứ việc gì. Đây là toàn bộ context của session làm việc giữa Claude và user.
 
-### AI Role
-Đây là session học thực chiến. Claude đóng vai **Senior Fullstack Developer (Angular + Java Spring Boot) với 8+ năm kinh nghiệm** — vừa là Tech Lead, vừa là mentor trực tiếp, vừa là đồng nghiệp cùng team. Phải duy trì role này xuyên suốt, không phá vỡ character.
+---
 
-### Cách giao task
-- Giao task theo **sprint thực tế** — không dạy lý thuyết chay
-- Mỗi task có: mục tiêu rõ ràng, hướng dẫn đủ để làm nhưng không làm thay
+## 1. Collaboration Protocol
+
+### Vai trò của Claude
+Senior Fullstack Developer (Angular + Java Spring Boot) 8+ năm kinh nghiệm — đóng vai Tech Lead, mentor trực tiếp, và đồng nghiệp cùng team. **Không phá vỡ role này.**
+
+### Cách làm việc
+- **[BẮT BUỘC] Cuối mỗi sprint: tự động cập nhật Section 9 của file này** — không cần user nhắc:
+  1. Tick `[x]` sprint vừa hoàn thành, ghi tóm tắt những gì đã build
+  2. Cập nhật `🔲 Đang làm` sang sprint tiếp theo
+  3. Cập nhật `Quyết định kỹ thuật` nếu có decision mới
+  4. Cập nhật `Next` list
+  5. Commit: `git add CLAUDE.md && git commit -m "Update CLAUDE.md: Sprint X complete"`
+- Giao task theo sprint thực tế, không dạy lý thuyết chay
 - Giải thích **tại sao** làm vậy, không chỉ làm gì
-- User tự implement, Claude review — không code thay trừ khi cần demo pattern mới
-- Giao từng phần nhỏ, review xong mới giao tiếp — không dump hết task một lúc
+- **Đọc file thực tế** để review — không hỏi user paste code
+- Format review: **PASS / KHÔNG ĐẠT** — liệt kê issue theo mức độ: Bug (fix ngay) / Cần cải thiện / Minor
+- Giao từng task nhỏ, review xong mới giao tiếp — không dump hết một lúc
+- Hỏi câu hỏi domain/design trước khi code — kiểm tra hiểu biết của user
+- Khen đúng chỗ khi user tự nghĩ ra quyết định tốt
+- Phản biện thẳng thắn nếu user đi sai hướng; acknowledge nếu user đúng
 
-### Cách review code
-- Đọc code thực tế từ file (dùng tool đọc file, không hỏi user paste)
-- Format review: **PASS / KHÔNG ĐẠT** rõ ràng, liệt kê từng issue
-- Phân loại issue: Bug (phải fix ngay) / Cần cải thiện (fix trước khi tiếp) / Minor (note lại, fix sau)
-- Giải thích tại sao issue đó là vấn đề, không chỉ nói "sai"
-- Khen đúng chỗ khi user tự nghĩ ra quyết định tốt (không nịnh chung chung)
-
-### Văn hóa làm việc
-- Claude phản biện nếu user đi sai hướng — thẳng thắn như đồng nghiệp senior, không chiều
-- User có thể phản biện lại Claude — Claude defend nếu đúng, acknowledge nếu user có point tốt hơn
-- Trao đổi domain/requirements trước khi code — sai ở requirements thì code xong phải bỏ
-- Không over-engineer: không thêm feature, abstraction, hoặc cleanup ngoài scope task
-
-### Tiêu chuẩn đầu ra
-Sau toàn bộ quá trình, user có thể:
-- Tự tin đi phỏng vấn mid-level fullstack (Angular + Spring Boot)
-- Onboard dự án mới bất kỳ và làm việc độc lập
-- Hiểu được lý do đằng sau các quyết định kỹ thuật, không chỉ copy pattern
+### Profile người dùng
+- **4 năm kinh nghiệm** đi làm thực tế
+- **FE mạnh**: Angular đã làm hết (component, routing, service, RxJS, state management) — đang dùng Angular 9, muốn upgrade lên v19
+- **BE còn yếu**: CRUD + JPA cơ bản, hay fix bug dự án cũ, chưa làm Security/JWT đúng cách
+- Học để **fill gaps BE**, không phải học từ đầu
+- Có IntelliJ, VS Code, Java 17, Node.js, Docker
+- Dùng **PostgreSQL qua Docker** (không cài local)
+- Hay tự thêm tool hay vào setup (ví dụ: tự thêm Adminer vào docker-compose)
+- Sẽ push back nếu không đồng ý — hãy defend hoặc acknowledge
 
 ### Language
 - Trao đổi: **tiếng Việt**
@@ -37,50 +41,24 @@ Sau toàn bộ quá trình, user có thể:
 
 ---
 
-## Role Setup
-- **AI role:** Senior Fullstack Developer / Tech Lead / Mentor
-- **User role:** Mid-level developer (4 years experience, strong FE Angular, leveling up BE Spring Boot)
-- **Goal:** Learn Spring Boot best practices through real project. Target: mid-level fullstack confidence for interviews.
-- **Language:** Vietnamese preferred for discussion, English for code.
+## 2. Project Overview
 
----
+**Mini online procurement system** — đấu thầu qua mạng, inspired by muasamcong.mpi.gov.vn
 
-## Project Overview
-
-Mini online public procurement system (đấu thầu qua mạng), inspired by muasamcong.mpi.gov.vn.
-
-### Actors
+### Actors & Account Rules
 | Role | Mô tả |
 |---|---|
-| `ADMIN` | Quản trị hệ thống, tạo tài khoản Investor và Contractor |
-| `INVESTOR` | Chủ đầu tư — tạo Plan, Tender, lập HSMT, đánh giá, công bố kết quả |
-| `CONTRACTOR` | Nhà thầu — tìm kiếm Tender, nộp HSDT, xem kết quả |
+| `ADMIN` | Quản trị, tạo tài khoản Investor và Contractor |
+| `INVESTOR` | Chủ đầu tư — tạo Plan/Tender, lập HSMT, đánh giá, công bố kết quả |
+| `CONTRACTOR` | Nhà thầu — tìm Tender, nộp HSDT, xem kết quả |
 
-### Account Creation Rules
-- Admin tạo tất cả tài khoản trực tiếp (không có self-registration, không có approval flow)
+- **Admin tạo tất cả tài khoản** — không có self-registration, không có approval flow
 - Single `users` table với nullable fields theo role
+- Default admin tạo tự động lúc startup qua `DataInitializer` (`admin@procurement.com` / `Admin@123`)
 
 ---
 
-## Tech Stack
-
-**Backend (main focus)**
-- Java 17, Spring Boot 4.x
-- Spring Security 6 + JWT (Sprint 4)
-- Spring Data JPA + PostgreSQL
-- Flyway migration
-- Lombok, Maven
-
-**Frontend** (later)
-- Angular 19 — standalone components, signals
-
-**Infrastructure**
-- PostgreSQL via Docker (`docker-compose.yml`)
-- Adminer tại `localhost:8081` để inspect DB
-
----
-
-## Domain Model & State Machines
+## 3. Domain Model
 
 ### Entity Hierarchy
 ```
@@ -88,170 +66,190 @@ User (ADMIN / INVESTOR / CONTRACTOR)
 │
 ├── Plan [KHLCNT] — Investor tạo
 │     └── Tender [Gói thầu] — nhiều tender trong 1 plan
-│           ├── BiddingDoc [HSMT] — có version, có thể nâng version
+│           ├── BiddingDoc [HSMT] — versioned document
 │           │     └── BiddingDocFile
 │           ├── BidSubmission [HSDT] — Contractor nộp
 │           │     └── BidSubmissionFile
-│           ├── BidEvaluation — Investor chấm điểm từng HSDT
+│           ├── BidEvaluation — Investor chấm từng HSDT
 │           └── TenderResult — kết quả cuối (1-1 với Tender)
 ```
 
 ### State Machines
 
-**Plan:**
-```
-DRAFT → IN_PROGRESS → COMPLETED | CANCELLED
-```
+**Plan:** `DRAFT → IN_PROGRESS → COMPLETED | CANCELLED`
 
-**Tender:**
-```
-DRAFT → PUBLISHED → HSMT_ISSUED → BIDDING → BID_CLOSED → EVALUATING → AWARDED | CANCELLED
-```
+**Tender:** `DRAFT → PUBLISHED → HSMT_ISSUED → BIDDING → BID_CLOSED → EVALUATING → AWARDED | CANCELLED`
 
-**BiddingDoc (HSMT):**
-```
-DRAFT → ACTIVE → SUPERSEDED
-```
-> Khi Investor publish version mới → tất cả BidSubmission đang SUBMITTED tự động WITHDRAWN
+**BiddingDoc:** `DRAFT → ACTIVE → SUPERSEDED`
+> Publish version mới → tất cả HSDT đang SUBMITTED tự động WITHDRAWN
 
-**BidSubmission (HSDT):**
-```
-DRAFT → SUBMITTED ↔ WITHDRAWN
-```
-> Chỉ được rút/nộp lại khi Tender còn ở BIDDING. Chỉ 1 SUBMITTED per contractor per tender tại một thời điểm. WITHDRAWN records giữ lại cho audit trail.
+**BidSubmission:** `DRAFT → SUBMITTED ↔ WITHDRAWN`
+> Phải rút (WITHDRAWN) rồi mới nộp lại. Chỉ 1 SUBMITTED per contractor per tender. WITHDRAWN records giữ lại cho audit.
+
+### Bid Visibility Rules
+| Tender State | Public | Investor | Contractor (của mình) |
+|---|---|---|---|
+| BIDDING | Thấy tender, tải HSMT | Thấy số lượng đã nộp | Thấy HSDT của mình |
+| BID_CLOSED | — | Thấy toàn bộ HSDT + giá | Thấy HSDT của mình |
+| EVALUATING | — | Chấm điểm, ghi chú | Không thấy thêm |
+| AWARDED | Thấy kết quả, nhà thầu trúng | Full access | Thắng/thua |
 
 ### Enums
 ```java
-UserRole:        ADMIN, INVESTOR, CONTRACTOR
-UserStatus:      ACTIVE, INACTIVE
-PlanStatus:      DRAFT, IN_PROGRESS, COMPLETED, CANCELLED
-TenderStatus:    DRAFT, PUBLISHED, HSMT_ISSUED, BIDDING, BID_CLOSED, EVALUATING, AWARDED, CANCELLED
-TenderType:      GOODS, CONSTRUCTION, NON_CONSULTING, CONSULTING
-TenderMethod:    OPEN_BIDDING, COMPETITIVE_QUOTE, DIRECT
+UserRole:         ADMIN, INVESTOR, CONTRACTOR
+UserStatus:       ACTIVE, INACTIVE
+PlanStatus:       DRAFT, IN_PROGRESS, COMPLETED, CANCELLED
+TenderStatus:     DRAFT, PUBLISHED, HSMT_ISSUED, BIDDING, BID_CLOSED, EVALUATING, AWARDED, CANCELLED
+TenderType:       GOODS, CONSTRUCTION, NON_CONSULTING, CONSULTING
+TenderMethod:     OPEN_BIDDING, COMPETITIVE_QUOTE, DIRECT
 BiddingDocStatus: DRAFT, ACTIVE, SUPERSEDED
-BidStatus:       DRAFT, SUBMITTED, WITHDRAWN
+BidStatus:        DRAFT, SUBMITTED, WITHDRAWN
 EvaluationResult: PASS, FAIL
 ```
 
-### Bid Opening Rules (who sees what)
-| Thời điểm | Public | Investor | Contractor (của mình) |
-|---|---|---|---|
-| BIDDING | Thấy Tender, tải HSMT | Thấy số lượng đã nộp | Thấy HSDT của mình |
-| BID_CLOSED | — | Thấy toàn bộ HSDT + giá | Thấy HSDT của mình |
-| EVALUATING | — | Chấm điểm, ghi chú | Không thấy thêm |
-| AWARDED | Thấy kết quả + nhà thầu trúng | Full | Thấy thắng/thua |
+---
+
+## 4. Tech Stack
+
+- Java 17, Spring Boot 4.x, Maven
+- Spring Security 6 + JWT (jjwt 0.12.6)
+- Spring Data JPA + PostgreSQL (Docker)
+- Flyway migration, Lombok
+- Angular 19 (chưa làm)
+- Adminer tại `localhost:8081`
 
 ---
 
-## Package Structure (Feature-based)
+## 5. Package Structure
 
 ```
 com.procurement.system/
+├── auth/                        ← POST /api/auth/login
 ├── common/
-│   ├── ApiResponse.java          ← unified response wrapper
-│   ├── config/
-│   │   ├── SecurityConfig.java   ← tạm disable, Sprint 4 sẽ implement JWT
-│   │   └── PasswordConfig.java   ← BCryptPasswordEncoder bean
-│   └── exception/
-│       ├── GlobalExceptionHandler.java
-│       ├── ResourceNotFoundException.java  ← 404
-│       └── BusinessException.java          ← 400
-├── user/
-│   ├── dto/ (CreateUserRequest, UpdateUserRequest, UserResponse)
-│   └── enums/ (UserRole, UserStatus)
-├── plan/
-│   └── enums/ (PlanStatus)
-├── tender/
-│   └── enums/ (TenderStatus, TenderType, TenderMethod)
-├── biddingdoc/
-│   └── enums/ (BiddingDocStatus)
-├── bidsubmission/
-│   └── enums/ (BidStatus)
-├── evaluation/
-│   └── enums/ (EvaluationResult)
-└── result/
+│   ├── ApiResponse.java
+│   ├── config/ (SecurityConfig, PasswordConfig, DataInitializer)
+│   ├── exception/ (GlobalExceptionHandler, ResourceNotFoundException, BusinessException)
+│   └── security/ (JwtUtil, JwtAuthenticationFilter, UserDetailsServiceImpl)
+├── user/                        ← /api/admin/users  ✅ DONE
+├── plan/                        ← /api/investor/plans  🔲 IN PROGRESS
+├── tender/                      ← /api/investor/tenders, /api/tenders/public
+├── biddingdoc/                  ← HSMT
+├── bidsubmission/               ← HSDT
+├── evaluation/                  ← chấm điểm
+└── result/                      ← kết quả cuối
 ```
 
 ---
 
-## API Conventions
+## 6. API Conventions
 
-### Response Format (luôn dùng ApiResponse<T>)
+```
+/api/auth/**          → public
+/api/admin/**         → ADMIN only
+/api/investor/**      → INVESTOR only
+/api/contractor/**    → CONTRACTOR only
+/api/tenders/public   → public
+```
+
+Response format — `ApiResponse<T>`:
 ```json
-// Success
 { "status": 200, "message": "Success", "data": { ... } }
-
-// Created
-{ "status": 201, "message": "Created", "data": { ... } }
-
-// Error
 { "status": 404, "message": "User not found", "data": null }
 ```
 
-### HTTP Status Codes
-- `POST` tạo resource → `201 Created`
-- `GET`, `PUT`, `PATCH` → `200 OK`
-- `DELETE` hoặc no-body operations → `204 No Content`
-
-### Exception Handling
-- `ResourceNotFoundException` → HTTP 404
-- `BusinessException` → HTTP 400
-- `MethodArgumentNotValidException` → HTTP 400 (validation)
-
-### Password
-- Hash bằng **BCrypt** trước khi lưu DB
-- **JWT** dùng cho authentication token (khác BCrypt — BCrypt là hash, JWT là token)
+POST → 201 | GET/PUT/PATCH → 200 | No-body → 204
 
 ---
 
-## Database
+## 7. Quyết định kỹ thuật quan trọng
 
-### Flyway Migrations (V1–V7)
-```
-V1: users
-V2: plans
-V3: tenders
-V4: bidding_docs, bidding_doc_files
-V5: bid_submissions, bid_submission_files
-V6: bid_evaluations
-V7: tender_results
-```
+| Quyết định | Lý do |
+|---|---|
+| Single `users` table | Đơn giản hơn tách profile tables; validate ở service layer |
+| Feature-based packages | Code liên quan gần nhau; gần microservices structure |
+| `Tender` (không phải `BiddingDetail`) | Standard term; không conflict với BidSubmission, BidEvaluation |
+| Tách `bidsubmission/`, `evaluation/`, `result/` | User đề xuất đúng — 3 concerns khác nhau |
+| `FetchType.LAZY` mọi relationship | Tránh N+1 query |
+| `BigDecimal` cho tiền | Tránh floating-point precision loss |
+| State machine validation | Check cả source lẫn target; dùng `switch` expression |
+| `@FutureOrPresent` ở DTO + cross-field ở Service | Annotation cho format; business rule cho logic |
+| BCrypt hash password, JWT là token | Hai thứ khác nhau — user đã từng nhầm |
+| JWT claims: userId + role (không có email) | Tránh PII trong token |
+| Error message generic: "Invalid credentials" | Tránh user enumeration attack |
+| `DataInitializer` với `existsByRole` guard | Idempotent — chạy nhiều lần không duplicate |
+| Check ownership → `ResourceNotFoundException` | Không tiết lộ resource có tồn tại không |
+| Plan `code` auto-gen + retry-on-unique | DB UNIQUE làm trọng tài; retry lo cho request thua đua |
+| `createPlan` KHÔNG `@Transactional` | Để mỗi `save()` tự là 1 transaction; tránh rollback-only khi retry |
 
-### Key Design Decisions
-- UUID primary keys (`gen_random_uuid()`)
-- `ddl-auto: validate` — Hibernate chỉ validate, Flyway quản lý schema
-- Single `users` table (nullable fields theo role, validated ở service layer)
+---
+
+## 8. Database
+
+Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_submissions + files → bid_evaluations → tender_results`
+
+- UUID PKs (`gen_random_uuid()`)
+- `ddl-auto: validate`
 - `proposed_price NOT NULL` trong `bid_submissions`
-- `tender_id UNIQUE` trong `tender_results` (1-1 relationship)
+- `tender_id UNIQUE` trong `tender_results`
 
 ---
 
-## Sprint Status
+## 9. Sprint Status
 
-### ✅ Sprint 1 — Project Setup & Database
-- Spring Boot project, Docker PostgreSQL, Adminer
-- Flyway migrations V1–V7
-- JPA Entities + Enums (tất cả đầy đủ)
-- Feature-based package structure
+### ✅ Đã hoàn thành
+- [x] **Sprint 1** — Setup, Docker, Flyway V1–V7, Entities + Enums, package structure
+- [x] **Sprint 2** — User API (5 endpoints), BCrypt, ApiResponse, GlobalExceptionHandler
+- [x] **Sprint 3** — JWT Auth, DataInitializer, `POST /api/auth/login`
 
-### ✅ Sprint 2 — User Management API
-- 5 endpoints: POST, GET list, GET by id, PUT, PATCH status
-- BCrypt password hashing
-- `ApiResponse<T>` unified wrapper
-- `GlobalExceptionHandler` với 3 exception types
-- DTOs: CreateUserRequest, UpdateUserRequest, UserResponse
+### 🔲 Đang làm — Sprint 4: Plan & Tender API
 
-### 🔲 Sprint 3 — Plan & Tender API (NEXT)
-**Pending decision:** JWT authentication trước hay Plan/Tender API trước?
-- JWT trước: `POST /api/plans` tự lấy investor từ token — realistic hơn
-- Plan/Tender trước: thấy kết quả nhanh hơn, JWT làm sau
+**Domain decisions (đã chốt):**
+- `code` (KHLCNT) **auto-gen** ở Service — không cho client nhập. Format `KH-{fiscalYear}-{0001}`. Chiến lược **retry-on-unique-violation** (mượn UNIQUE constraint làm trọng tài). → `CreatePlanRequest` cần bỏ field `code` khi code Service.
+- INVESTOR chỉ thấy plan **của mình** — chặn ngay ở query (`findByIdAndInvestor`), không lọc sau.
+- Create: client KHÔNG gửi `status`; BE set cứng `DRAFT`.
+
+**Tiến độ task:**
+- [x] **4.1 `PlanRepository`** — `findAllByInvestor`, `findByIdAndInvestor`, `countByFiscalYear`
+- [ ] **4.2 `PlanService`** — `getCurrentInvestorId()` + `validateTransition()` + 5 method (create/getMy list/getMy by id/update/changeStatus). ⚠️ `createPlan` KHÔNG đánh `@Transactional` (để retry-on-unique chạy được). ⏳ ĐANG LÀM
+- [ ] **4.3 `PlanController`** — 5 endpoints tại `/api/investor/plans`
+- [ ] Tender API (cấu trúc tương tự + `bid_deadline` validation)
+
+SecurityConfig đã thêm route rules: `/api/tenders/public/**` (public), `/api/investor/**` (INVESTOR), `/api/contractor/**` (CONTRACTOR).
+
+Pattern đã dạy:
+```java
+// Lấy current user
+private UUID getCurrentInvestorId() {
+    String userId = (String) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
+    return UUID.fromString(userId);
+}
+
+// State machine guard
+private void validateTransition(PlanStatus current, PlanStatus target) {
+    boolean valid = switch (current) {
+        case DRAFT -> target == PlanStatus.IN_PROGRESS || target == PlanStatus.CANCELLED;
+        case IN_PROGRESS -> target == PlanStatus.COMPLETED || target == PlanStatus.CANCELLED;
+        default -> false;
+    };
+    if (!valid) throw new BusinessException("Cannot transition from " + current + " to " + target);
+}
+```
+
+### Next
+1. Hoàn thành Plan & Tender CRUD (Sprint 4)
+2. BiddingDoc API — upload HSMT, versioning, auto-withdraw
+3. BidSubmission API — nộp/rút/re-submit
+4. Evaluation + Result API
+5. Angular 19 frontend
 
 ---
 
-## Coding Conventions
-- Không viết comment (trừ khi logic thực sự non-obvious)
-- Dùng `FetchType.LAZY` cho tất cả `@ManyToOne` / `@OneToOne`
-- Dùng `BigDecimal` cho tất cả giá trị tiền tệ (không dùng Double/Float)
-- `toResponse()` method trong Service để map Entity → DTO
-- Không expose Entity trực tiếp từ Controller
-- Custom exception thay vì `RuntimeException` thuần
+## 10. Coding Conventions
+- Không comment (trừ khi logic non-obvious)
+- `FetchType.LAZY` cho mọi relationship
+- `BigDecimal` cho tiền
+- `toResponse()` private trong Service
+- Không expose Entity từ Controller
+- Custom exception thay vì `RuntimeException`
+- `@Valid` trên `@RequestBody`
