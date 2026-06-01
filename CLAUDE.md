@@ -131,7 +131,7 @@ com.procurement.system/
 │   ├── exception/ (GlobalExceptionHandler, ResourceNotFoundException, BusinessException)
 │   └── security/ (JwtUtil, JwtAuthenticationFilter, UserDetailsServiceImpl)
 ├── user/                        ← /api/admin/users  ✅ DONE
-├── plan/                        ← /api/investor/plans  🔲 IN PROGRESS
+├── plan/                        ← /api/investor/plans  ✅ DONE
 ├── tender/                      ← /api/investor/tenders, /api/tenders/public
 ├── biddingdoc/                  ← HSMT
 ├── bidsubmission/               ← HSDT
@@ -180,6 +180,8 @@ POST → 201 | GET/PUT/PATCH → 200 | No-body → 204
 | Check ownership → `ResourceNotFoundException` | Không tiết lộ resource có tồn tại không |
 | Plan `code` auto-gen + retry-on-unique | DB UNIQUE làm trọng tài; retry lo cho request thua đua |
 | `createPlan` KHÔNG `@Transactional` | Để mỗi `save()` tự là 1 transaction; tránh rollback-only khi retry |
+| `updatePlan` chỉ cho sửa khi DRAFT | Khi plan đã IN_PROGRESS có tender đang chạy — lock để tránh inconsistency |
+| Read methods dùng `@Transactional(readOnly=true)` | Giữ session mở để lazy-load `investor` trong `toResponse()`; tắt dirty checking |
 
 ---
 
@@ -210,9 +212,9 @@ Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_su
 
 **Tiến độ task:**
 - [x] **4.1 `PlanRepository`** — `findAllByInvestor`, `findByIdAndInvestor`, `countByFiscalYear`
-- [ ] **4.2 `PlanService`** — `getCurrentInvestorId()` + `validateTransition()` + 5 method (create/getMy list/getMy by id/update/changeStatus). ⚠️ `createPlan` KHÔNG đánh `@Transactional` (để retry-on-unique chạy được). ⏳ ĐANG LÀM
-- [ ] **4.3 `PlanController`** — 5 endpoints tại `/api/investor/plans`
-- [ ] Tender API (cấu trúc tương tự + `bid_deadline` validation)
+- [x] **4.2 `PlanService`** — `getCurrentInvestorId()` + `validateTransition()` + 5 method (create/getMy list/getMy by id/update/changeStatus). `createPlan` KHÔNG `@Transactional`; read methods dùng `@Transactional(readOnly=true)`
+- [x] **4.3 `PlanController`** — 5 endpoints tại `/api/investor/plans`; `@RequestBody @Valid` đầy đủ
+- [ ] **4.4 Tender API** — cấu trúc tương tự Plan + `bid_deadline` validation ⏳ ĐANG LÀM
 
 SecurityConfig đã thêm route rules: `/api/tenders/public/**` (public), `/api/investor/**` (INVESTOR), `/api/contractor/**` (CONTRACTOR).
 

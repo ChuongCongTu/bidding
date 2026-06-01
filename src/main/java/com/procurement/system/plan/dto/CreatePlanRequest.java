@@ -13,9 +13,6 @@ public class CreatePlanRequest {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String code;
-
     private BigDecimal totalBudget;
 
     private Integer fiscalYear;
