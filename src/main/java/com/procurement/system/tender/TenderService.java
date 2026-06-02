@@ -136,6 +136,41 @@ public class TenderService {
         tenderRepository.delete(tender);
     }
 
+    @Transactional
+    public TenderResponse changeStatus(UUID id, TenderStatus status) {
+        User investor = userRepository.findById(getCurrentInvestorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Investor not found"));
+
+        Tender tender = tenderRepository.findByIdAndInvestorId(id, investor.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tender not found"));
+
+        validateTransition(tender.getStatus(), status);
+
+        tender.setStatus(status);
+
+        return toResponse(tender);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TenderResponse> getPublicTenders() {
+        List<TenderStatus> tenderStatuses = List.of(TenderStatus.PUB_MT, TenderStatus.OPEN_BID, TenderStatus.PUB_KQLCNT);
+        List<Tender> tenders = tenderRepository.findAllByStatusIn(tenderStatuses);
+
+        return tenders.stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public TenderResponse getPublicTenderById(UUID id) {
+        Tender tender = tenderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tender not found"));
+        List<TenderStatus> tenderStatuses = List.of(TenderStatus.PUB_MT, TenderStatus.OPEN_BID, TenderStatus.PUB_KQLCNT);
+        if (!tenderStatuses.contains(tender.getStatus())) {
+            throw new ResourceNotFoundException("Tender not found");
+        }
+
+        return toResponse(tender);
+    }
+
     private UUID getCurrentInvestorId() {
         String userId = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();

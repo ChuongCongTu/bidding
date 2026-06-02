@@ -203,7 +203,7 @@ Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_su
 - [x] **Sprint 2** — User API (5 endpoints), BCrypt, ApiResponse, GlobalExceptionHandler
 - [x] **Sprint 3** — JWT Auth, DataInitializer, `POST /api/auth/login`
 
-### 🔲 Đang làm — Sprint 4: Plan & Tender API
+### ✅ Sprint 4 — Plan & Tender API (DONE)
 
 **Domain decisions (đã chốt):**
 - `code` (KHLCNT) **auto-gen** ở Service — không cho client nhập. Format `KH-{fiscalYear}-{0001}`. Chiến lược **retry-on-unique-violation** (mượn UNIQUE constraint làm trọng tài). → `CreatePlanRequest` cần bỏ field `code` khi code Service.
@@ -214,12 +214,12 @@ Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_su
 - [x] **4.1 `PlanRepository`** — `findAllByInvestor`, `findByIdAndInvestor`, `countByFiscalYear`
 - [x] **4.2 `PlanService`** — `getCurrentInvestorId()` + `validateTransition()` + 5 method (create/getMy list/getMy by id/update/changeStatus). `createPlan` KHÔNG `@Transactional`; read methods dùng `@Transactional(readOnly=true)`
 - [x] **4.3 `PlanController`** — 5 endpoints tại `/api/investor/plans`; `@RequestBody @Valid` đầy đủ
-- [ ] **4.4 Tender API** ⏳ ĐANG LÀM
+- [x] **4.4 Tender API** ✅ DONE
   - [x] DTOs: `CreateTenderRequest`, `UpdateTenderRequest`, `ChangeTenderStatusRequest`, `TenderResponse`
   - [x] `TenderRepository` — `findAllByPlan`, `findByIdAndInvestorId` (@Query JPQL), `findAllByStatusIn`, `countByFiscalYear`
-  - [x] `TenderService` — `createTender`, `getMyTenders`, `getMyTenderById`, `updateTender` (chỉ NEW), `deleteTender` (chỉ NEW)
-  - [ ] `TenderService` — `changeStatus`, `getPublicTenders`, `getPublicTenderById`
-  - [ ] `TenderController` — 6 investor endpoints + 2 public endpoints
+  - [x] `TenderService` — đầy đủ 8 methods
+  - [x] `TenderController` — 6 investor endpoints tại `/api/investor/tenders`
+  - [x] `TenderPublicController` — 2 public endpoints tại `/api/tenders/public`
 
 **Domain decisions Tender (đã chốt):**
 - `TenderStatus`: `NEW → INIT_MT → PUB_MT → OPEN_BID → PUB_KQLCNT | CANCEL_BID`. NEW xóa thẳng (DELETE), không cancel. PUB_KQLCNT và CANCEL_BID là terminal.
@@ -231,12 +231,10 @@ Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_su
 SecurityConfig route rules: `/api/tenders/public/**` (public), `/api/investor/**` (INVESTOR), `/api/contractor/**` (CONTRACTOR).
 
 ### Next
-1. `TenderService`: `changeStatus`, `getPublicTenders`, `getPublicTenderById`
-2. `TenderController`: 6 investor + 2 public endpoints
-3. BiddingDoc API — upload HSMT, versioning, auto-withdraw
-4. BidSubmission API — nộp/rút/re-submit
-5. Evaluation + Result API
-6. Angular 19 frontend
+1. BiddingDoc API — upload HSMT, versioning, auto-withdraw BidSubmission khi publish version mới
+2. BidSubmission API — nộp/rút/re-submit HSDT
+3. Evaluation + Result API
+4. Angular 19 frontend
 
 ---
 
