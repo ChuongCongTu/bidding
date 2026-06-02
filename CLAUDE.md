@@ -214,36 +214,29 @@ Flyway V1–V7: `users → plans → tenders → bidding_docs + files → bid_su
 - [x] **4.1 `PlanRepository`** — `findAllByInvestor`, `findByIdAndInvestor`, `countByFiscalYear`
 - [x] **4.2 `PlanService`** — `getCurrentInvestorId()` + `validateTransition()` + 5 method (create/getMy list/getMy by id/update/changeStatus). `createPlan` KHÔNG `@Transactional`; read methods dùng `@Transactional(readOnly=true)`
 - [x] **4.3 `PlanController`** — 5 endpoints tại `/api/investor/plans`; `@RequestBody @Valid` đầy đủ
-- [ ] **4.4 Tender API** — cấu trúc tương tự Plan + `bid_deadline` validation ⏳ ĐANG LÀM
+- [ ] **4.4 Tender API** ⏳ ĐANG LÀM
+  - [x] DTOs: `CreateTenderRequest`, `UpdateTenderRequest`, `ChangeTenderStatusRequest`, `TenderResponse`
+  - [x] `TenderRepository` — `findAllByPlan`, `findByIdAndInvestorId` (@Query JPQL), `findAllByStatusIn`, `countByFiscalYear`
+  - [x] `TenderService` — `createTender`, `getMyTenders`, `getMyTenderById`, `updateTender` (chỉ NEW), `deleteTender` (chỉ NEW)
+  - [ ] `TenderService` — `changeStatus`, `getPublicTenders`, `getPublicTenderById`
+  - [ ] `TenderController` — 6 investor endpoints + 2 public endpoints
 
-SecurityConfig đã thêm route rules: `/api/tenders/public/**` (public), `/api/investor/**` (INVESTOR), `/api/contractor/**` (CONTRACTOR).
+**Domain decisions Tender (đã chốt):**
+- `TenderStatus`: `NEW → INIT_MT → PUB_MT → OPEN_BID → PUB_KQLCNT | CANCEL_BID`. NEW xóa thẳng (DELETE), không cancel. PUB_KQLCNT và CANCEL_BID là terminal.
+- Tender code auto-gen: `GT-{fiscalYear}-{0001}`, fiscalYear lấy từ plan (fallback `LocalDate.now().getYear()`)
+- Ownership check qua plan: `planRepository.findByIdAndInvestor(planId, investor)`
+- `updateTender` và `deleteTender` chỉ cho phép khi status = `NEW`
+- `TenderRepository.findByIdAndInvestorId` dùng `@Query` JPQL thay vì Spring Data derived naming
 
-Pattern đã dạy:
-```java
-// Lấy current user
-private UUID getCurrentInvestorId() {
-    String userId = (String) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
-    return UUID.fromString(userId);
-}
-
-// State machine guard
-private void validateTransition(PlanStatus current, PlanStatus target) {
-    boolean valid = switch (current) {
-        case DRAFT -> target == PlanStatus.IN_PROGRESS || target == PlanStatus.CANCELLED;
-        case IN_PROGRESS -> target == PlanStatus.COMPLETED || target == PlanStatus.CANCELLED;
-        default -> false;
-    };
-    if (!valid) throw new BusinessException("Cannot transition from " + current + " to " + target);
-}
-```
+SecurityConfig route rules: `/api/tenders/public/**` (public), `/api/investor/**` (INVESTOR), `/api/contractor/**` (CONTRACTOR).
 
 ### Next
-1. Hoàn thành Plan & Tender CRUD (Sprint 4)
-2. BiddingDoc API — upload HSMT, versioning, auto-withdraw
-3. BidSubmission API — nộp/rút/re-submit
-4. Evaluation + Result API
-5. Angular 19 frontend
+1. `TenderService`: `changeStatus`, `getPublicTenders`, `getPublicTenderById`
+2. `TenderController`: 6 investor + 2 public endpoints
+3. BiddingDoc API — upload HSMT, versioning, auto-withdraw
+4. BidSubmission API — nộp/rút/re-submit
+5. Evaluation + Result API
+6. Angular 19 frontend
 
 ---
 
